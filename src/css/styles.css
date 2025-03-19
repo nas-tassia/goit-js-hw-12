@@ -136,3 +136,36 @@ input:active, input:focus{
     0% , 60% , 100%{ transform:  scale(1) }
     80% { transform:  scale(1.2)}
   }
+  .load_btn{
+    display: block;
+    font-family: "Montserrat", sans-serif;
+    font-weight: 500;
+    font-size: 16px;
+    line-height: 150%;
+    letter-spacing: 0.04em;
+    width: auto;
+    padding: 8px 16px;
+    border-radius: 8px;
+    color: #ffff;
+    background-color: #4E75FF;
+    border: none;
+    margin: 0 auto;
+  }
+  .load_btn:hover{
+    background: #6c8cff;
+}
+.is-hidden {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    margin: -1px;
+    border: 0;
+    padding: 0;
+    white-space: nowrap;
+    clip-path: inset(100%);
+    clip: rect(0 0 0 0);
+    overflow: hidden;
+  }
