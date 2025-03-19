@@ -1,5 +1,5 @@
 import "izitoast/dist/css/iziToast.min.css";
-import {createGalleryCard, lightbox} from './js/render-functions';
+import {renderGallery, refreshLightbox} from './js/render-functions';
 import {fetchPhotosByQuery} from './js/pixabay-api'
 import iziToast from "izitoast";
 
@@ -39,27 +39,24 @@ const onSearchFormSubmit = event =>{
 
     showLoader();
 
-    fetchPhotosByQuery(search, page, 10) 
+    fetchPhotosByQuery(search, page) 
         .then(({hits, totalHits}) => {
             if (hits.length === 0){
                 iziToast.info({
                     title: 'Info',
-                    message: 'We are sorry, but you have reached the end of search results!',
+                    message: 'No images found!',
                     position: 'topRight',
                     timeout: 5000, 
                 });
             
                 refs.form.reset();
-                refs.gallery.innerHTML = ''; 
                 return;
             
             }
 
             totalPages = Math.ceil(totalHits / 10);
-            const galleryCard = hits.map(img => createGalleryCard(img)).join('');
-            refs.gallery.innerHTML = galleryCard;
-
-            lightbox();
+            renderGallery(refs.gallery, hits);
+            refreshLightbox();
 
             if (page < totalPages) {
                 refs.loadMore.classList.remove('is-hidden');
@@ -76,18 +73,25 @@ const onSearchFormSubmit = event =>{
 
 const onLoadMoreClick = () => {
     page += 1; 
+    refs.loadMore.classList.add('is-hidden'); 
     showLoader();
 
-    fetchPhotosByQuery(search, page, 10)
+    fetchPhotosByQuery(search, page)
         .then(({ hits }) => {
-            const galleryCard = hits.map(img => createGalleryCard(img)).join('');
-            refs.gallery.insertAdjacentHTML('beforeend', galleryCard);
+            renderGallery(refs.gallery, hits);
             const itemHeight = refs.gallery.children[0].getBoundingClientRect().height;
             smoothScrollBy(itemHeight * 2, 1000);
-            lightbox(); 
 
             if (page >= totalPages) {
+                iziToast.info({
+                    title: 'End of Results',
+                    message: 'We are sorry, but you have reached the end of search results',
+                    position: 'topRight',
+                    timeout: 5000,
+                });
                 refs.loadMore.classList.add('is-hidden');
+            } else {
+                refs.loadMore.classList.remove('is-hidden');
             }
         })
         .catch(err => console.log(err))
