@@ -9,10 +9,10 @@ import axios from 'axios';
 //                 return response.json();
 //             });
 // }
-export const fetchPhotosByQuery = async (query, page) =>{
+export const fetchPhotosByQuery = async (query) =>{
     try {
         const response = await axios.get(
-            `https://pixabay.com/api/?key=49376861-d933ee90ccf66fe84851db78b&q=${query}&image_type=photo&orientation=horizontal&safesearch=true&page=${page}&per_page=10`
+            `https://pixabay.com/api/?key=49376861-d933ee90ccf66fe84851db78b&q=${query}&image_type=photo&orientation=horizontal&safesearch=true&page=1&per_page=10`
         );
 
         return response.data; 

@@ -39,7 +39,7 @@ const onSearchFormSubmit = event =>{
 
     showLoader();
 
-    fetchPhotosByQuery(search, page) 
+    fetchPhotosByQuery(search) 
         .then(({hits, totalHits}) => {
             if (hits.length === 0){
                 iziToast.info({
@@ -76,7 +76,7 @@ const onLoadMoreClick = () => {
     refs.loadMore.classList.add('is-hidden'); 
     showLoader();
 
-    fetchPhotosByQuery(search, page)
+    fetchPhotosByQuery(search)
         .then(({ hits }) => {
             renderGallery(refs.gallery, hits);
             const itemHeight = refs.gallery.children[0].getBoundingClientRect().height;
