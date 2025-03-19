@@ -20,11 +20,12 @@ const showLoader = () => {
 const hideLoader = () => {
     refs.loader.style.display = 'none';
 };
-const onSearchFormSubmit = event =>{
+const onSearchFormSubmit = async (event) => {
     event.preventDefault();
 
     search = event.currentTarget.elements["search-text"].value.trim();
-    page = 1;
+    page = 1; 
+
     if (search === '') {
         iziToast.warning({
             title: 'Warning',
@@ -33,69 +34,72 @@ const onSearchFormSubmit = event =>{
         });
         return;
     }
-    
+
     refs.gallery.innerHTML = ''; 
-    refs.loadMore.classList.add('is-hidden'); 
+    refs.loadMore.classList.add('is-hidden');
 
     showLoader();
 
-    fetchPhotosByQuery(search) 
-        .then(({hits, totalHits}) => {
-            if (hits.length === 0){
-                iziToast.info({
-                    title: 'Info',
-                    message: 'No images found!',
-                    position: 'topRight',
-                    timeout: 5000, 
-                });
-            
-                refs.form.reset();
-                return;
-            
-            }
+    try {
+        const { hits, totalHits } = await fetchPhotosByQuery(search, page);
+        hideLoader(); 
 
-            totalPages = Math.ceil(totalHits / 10);
-            renderGallery(refs.gallery, hits);
-            refreshLightbox();
+        if (hits.length === 0) {
+            iziToast.info({
+                title: 'Info',
+                message: 'No images found!',
+                position: 'topRight',
+                timeout: 5000,
+            });
+            refs.form.reset();
+            return;
+        }
 
-            if (page < totalPages) {
-                refs.loadMore.classList.remove('is-hidden');
-            }
+        totalPages = Math.ceil(totalHits / 10); 
+        renderGallery(refs.gallery, hits);
+        refreshLightbox(); 
 
-        })
-        .catch(err => {
-            console.log(err);
-        })
-        .finally(() => {
-            hideLoader();
-        });
+        if (page < totalPages) {
+            refs.loadMore.classList.remove('is-hidden'); 
+        }
+
+    } catch (error) {
+        console.error(error);
+        hideLoader();
+    } 
 };
 
-const onLoadMoreClick = () => {
-    page += 1; 
-    refs.loadMore.classList.add('is-hidden'); 
+const onLoadMoreClick = async () => {
+    page += 1;
+    refs.loadMore.classList.add('is-hidden');
     showLoader();
 
-    fetchPhotosByQuery(search)
-        .then(({ hits }) => {
-            renderGallery(refs.gallery, hits);
-            const itemHeight = refs.gallery.children[0].getBoundingClientRect().height;
-            smoothScrollBy(itemHeight * 2, 1000);
+    try {
+        const { hits } = await fetchPhotosByQuery(search, page); 
+        hideLoader();
 
-            if (page >= totalPages) {
-                iziToast.info({
-                    title: 'End of Results',
-                    message: 'We are sorry, but you have reached the end of search results',
-                    position: 'topRight',
-                    timeout: 5000,
-                });
-                refs.loadMore.classList.add('is-hidden');
-            } else {
-                refs.loadMore.classList.remove('is-hidden');
-            }
-        })
-        .catch(err => console.log(err))
-        .finally(() => hideLoader());
+        renderGallery(refs.gallery, hits);
+        refreshLightbox(); 
+
+        const itemHeight = refs.gallery.children[0].getBoundingClientRect().height;
+        smoothScrollBy(itemHeight * 2, 1000);
+
+        if (page >= totalPages) {
+            iziToast.info({
+                title: 'End of Results',
+                message: 'We are sorry, but you have reached the end of search results',
+                position: 'topRight',
+                timeout: 5000,
+            });
+            refs.loadMore.classList.add('is-hidden');
+        } else {
+            refs.loadMore.classList.remove('is-hidden'); 
+        }
+
+    } catch (error) {
+        console.error(error);
+        hideLoader();
+    } 
 };
 const smoothScrollBy = (targetScroll, duration) => {
     const start = window.scrollY;

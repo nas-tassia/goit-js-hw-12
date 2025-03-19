@@ -9,16 +9,28 @@ import axios from 'axios';
 //                 return response.json();
 //             });
 // }
-export const fetchPhotosByQuery = async (query) =>{
+
+const API_KEY = "49376861-d933ee90ccf66fe84851db78b";
+const BASE_URL = "https://pixabay.com/api/";
+
+export const fetchPhotosByQuery = async (query, page = 1, perPage = 10) => {
     try {
-        const response = await axios.get(
-            `https://pixabay.com/api/?key=49376861-d933ee90ccf66fe84851db78b&q=${query}&image_type=photo&orientation=horizontal&safesearch=true&page=1&per_page=10`
-        );
+        const response = await axios.get(BASE_URL, {
+            params: {
+                key: API_KEY,
+                q: query,
+                image_type: "photo",
+                orientation: "horizontal",
+                safesearch: true,
+                page,       
+                per_page: perPage, 
+            },
+        });
 
         return response.data; 
 
     } catch (error) {
         console.error(error);
-        throw error;
+        throw error; 
     }
-}
+};
